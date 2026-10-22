@@ -75,8 +75,7 @@ public class Maps.Marker : Shumate.Marker {
         box.append (delete_button);
 
         popover = new Gtk.Popover () {
-            child = box,
-            position = Gtk.PositionType.TOP
+            child = box
         };
 
         var menubutton = new Gtk.MenuButton () {
@@ -85,6 +84,7 @@ public class Maps.Marker : Shumate.Marker {
             tooltip_text = markerdata.name
         };
 
+        popover.position = Gtk.PositionType.TOP;
         child = menubutton;
 
         name_entry.bind_property ("text",

@@ -58,11 +58,11 @@ public class Maps.MarkerManager : Object {
         var json_array = new Json.Array ();
 
         foreach (var marker in marker_list) {
-            
+
             // Deleted markers are set to null
             if (marker == null) {
                 continue;
-            } 
+            }
 
             json_array.add_object_element (marker.markerdata.to_json ());
         }
