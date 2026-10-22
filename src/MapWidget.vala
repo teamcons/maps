@@ -170,8 +170,7 @@ public class Maps.MapWidget : Gtk.Box {
         var marker = new Shumate.Point () {
             latitude = latitude,
             longitude = longitude,
-            selectable = true,
-            tooltip_text = _("You are here")
+            selectable = true
         };
 
         var label = new Granite.HeaderLabel (_("You are here"));
