@@ -50,6 +50,18 @@ public class Maps.MapWidget : Gtk.Box {
 
         location_layer = new Shumate.MarkerLayer (map_widget.viewport);
         map_widget.add_overlay_layer (location_layer);
+
+
+        var markermanager = new MarkerManager (pin_layer);
+
+        var markerdata = new MarkerData () {
+            latitude = 48.858400,
+            longitude = 2.294500,
+            name = "Eiffel Tower",
+            notes = "Oooh"
+        };
+
+        markermanager.add_marker (markerdata);
     }
 
     // Set the initial location of the map widget.
