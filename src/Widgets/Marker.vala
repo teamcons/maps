@@ -56,7 +56,8 @@ public class Maps.Marker : Shumate.Marker {
             child = scrolled
         };
 
-        var delete_button = new Gtk.Button.with_label (_("Delete…")) {
+        var delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic") {
+            tooltip_text = _("Delete this location"),
             halign = Gtk.Align.START,
         };
         delete_button.add_css_class (Granite.CssClass.DESTRUCTIVE);

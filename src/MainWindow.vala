@@ -26,6 +26,7 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
     private Cancellable? search_cancellable = null;
 
     private Gtk.Button current_location;
+    private Gtk.Button pin_location;
     private Gtk.Spinner spinner;
     private Gtk.SearchEntry search_entry;
     private Gtk.Popover search_res_popover;
@@ -39,6 +40,11 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
 
         current_location = new Gtk.Button.from_icon_name ("find-location-symbolic") {
             tooltip_text = _("Move to the current location"),
+            valign = CENTER
+        };
+
+        pin_location = new Gtk.Button.from_icon_name ("view-pin-symbolic") {
+            tooltip_text = _("Pin a location"),
             valign = CENTER
         };
 
@@ -160,6 +166,7 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
             title_widget = search_clamp
         };
         headerbar.pack_start (current_location);
+        headerbar.pack_start (pin_location);
         headerbar.pack_end (menu_button);
         headerbar.pack_end (spinner);
 
