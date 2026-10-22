@@ -17,9 +17,9 @@ public class Maps.Storage : Object {
         ensure_datadir ();
 
         storage_file_path = GLib.Path.build_path (Path.DIR_SEPARATOR_S, path_data, STORAGE_FILENAME);
+        print ("\nLocations are stored at %s", storage_file_path);
     }
 
-    /*************************************************/
     /**
     * Persistently check for the data directory and create if there is none 
     */
@@ -39,7 +39,6 @@ public class Maps.Storage : Object {
         }
     }
 
-    /*************************************************/
     /**
     * Converts a Json.Node into a string and take care of saving it
     */
@@ -55,11 +54,10 @@ public class Maps.Storage : Object {
             generator.to_file (storage_file_path);
 
         } catch (Error e) {
-            warning ("Failed to save points of interest %s", e.message);
+            warning ("Failed to save locations: %s", e.message);
         }
     }
 
-    /*************************************************/
     /**
     * Grab from storage, into a Json.Node we can parse. Insist if necessary
     */

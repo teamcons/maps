@@ -10,6 +10,7 @@ public class Maps.Marker : Shumate.Marker {
     public MarkerData markerdata {get; construct;}
 
     private Gtk.Popover popover;
+    public signal void changed ();
     public signal void deletion_requested (int markerdata_id);
 
     public Marker (MarkerData markerdata) {
@@ -32,10 +33,6 @@ public class Maps.Marker : Shumate.Marker {
             text = markerdata.name
         };
 
-        var name_label = new Granite.HeaderLabel (_("Name:")) {
-            mnemonic_widget = name_entry
-        };
-
         var comment_textview = new Granite.HyperTextView () {
             accepts_tab = false,
             wrap_mode = WORD_CHAR,
@@ -47,13 +44,9 @@ public class Maps.Marker : Shumate.Marker {
 
         comment_textview.buffer.text = markerdata.notes;
 
-        var comment_label = new Granite.HeaderLabel (_("Comments:")) {
-            mnemonic_widget = comment_textview
-        };
-
         var scrolled = new Gtk.ScrolledWindow () {
             child = comment_textview,
-            height_request = 100,
+            height_request = 80,
             hexpand = true,
             vexpand = true,
             hscrollbar_policy = NEVER
@@ -68,9 +61,7 @@ public class Maps.Marker : Shumate.Marker {
         };
         delete_button.add_css_class (Granite.CssClass.DESTRUCTIVE);
 
-        //box.append (name_label);
         box.append (name_entry);
-        //box.append (comment_label);
         box.append (frame);
         box.append (delete_button);
 
@@ -100,6 +91,11 @@ public class Maps.Marker : Shumate.Marker {
             GLib.BindingFlags.DEFAULT);
 
         delete_button.clicked.connect (delete_marker);
+        popover.closed.connect (on_popover_closed);
+    }
+
+    public void on_popover_closed () {
+        changed ();
     }
 
     public void delete_marker () {

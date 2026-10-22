@@ -57,11 +57,13 @@ public class Maps.MapWidget : Gtk.Box {
         var markerdata = new MarkerData () {
             latitude = 48.858400,
             longitude = 2.294500,
-            name = "Eiffel Tower",
-            notes = "Oooh"
+            name = "Eiffel Tower!",
+            notes = "Elly was here! The place was very crowded!"
         };
 
-        markermanager.add_marker (markerdata);
+        //  markermanager.add_marker (markerdata);
+        //  markermanager.save_all ();
+        markermanager.populate_layer.begin ();
     }
 
     // Set the initial location of the map widget.

@@ -17,6 +17,7 @@ public class Maps.MarkerManager : Object {
 
     construct {
         storage = new Storage ();
+        marker_list = new Gee.ArrayList<Maps.Marker?> ();
     }
 
     public async void populate_layer () {
@@ -36,25 +37,28 @@ public class Maps.MarkerManager : Object {
         marker_list.add (marker);
         markerlayer.add_marker (marker);
 
+        marker.changed.connect (save_all);
         marker.deletion_requested.connect (remove_marker);
     }
 
     public void remove_marker (int marker_id) {
-
-        // 0 is our current location
-        if (marker_id == 0) {
-            return;
-        }
+        print ("Deletion requested!");
 
         // Each MarkerData has an unique ID that mirrors their position in the list
         var marker = marker_list[marker_id];
+
+        marker.changed.disconnect (save_all);
+
+        marker.deletion_requested.disconnect (remove_marker);
         marker.destroy ();
         marker_list[marker_id] = null;
 
         save_all ();
     }
 
-    private void save_all () {
+    public void save_all () {
+        print ("Saving!");
+
         var json_array = new Json.Array ();
 
         foreach (var marker in marker_list) {
