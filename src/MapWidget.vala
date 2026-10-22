@@ -174,6 +174,20 @@ public class Maps.MapWidget : Gtk.Box {
             tooltip_text = _("You are here")
         };
 
+        var label = new Granite.HeaderLabel (_("You are here"));
+
+        var popover = new Gtk.Popover () {
+            child = label
+        };
+
+        var menubutton = new Gtk.MenuButton () {
+            popover = popover,
+            opacity = 0.0
+        };
+
+        popover.position = Gtk.PositionType.TOP;
+        marker.child = menubutton;
+
         location_layer.add_marker (marker);
     }
 
