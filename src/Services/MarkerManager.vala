@@ -12,7 +12,7 @@
  *
  */
 public class Maps.MarkerManager : Object {
-    
+
     private static bool popup_new_markers = false;
 
     private Storage storage;
