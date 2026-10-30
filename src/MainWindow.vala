@@ -27,7 +27,7 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
     private Cancellable? search_cancellable = null;
 
     private Gtk.Button current_location;
-    private Gtk.Button pin_location;
+    private Gtk.ToggleButton pin_location;
     private Gtk.Spinner spinner;
     private Gtk.SearchEntry search_entry;
     private Gtk.Popover search_res_popover;
@@ -52,8 +52,9 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
             valign = CENTER
         };
 
-        pin_location = new Gtk.Button.from_icon_name ("view-pin-symbolic") {
+        pin_location = new Gtk.ToggleButton () {
             tooltip_text = _("Pin a location"),
+            icon_name = "view-pin-symbolic",
             action_name = "win.pin",
             valign = CENTER
         };
@@ -383,8 +384,10 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
         search_result_item.place = (Geocode.Place) list_item.item;
     }
 
+    // We handle a pin mode at the level of the window, so we can disable the pin button,
+    // or cancel if the user press escape, or clicks anywhere but the map
     private void on_pin_activate () {
-        pin_location.sensitive = false;
+        pin_location.active = true;
 
         set_cursor_from_name ("crosshair");
         map_widget.set_cursor_from_name ("crosshair");
@@ -398,13 +401,14 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
 
     private void on_exit_pin_mode () {
         set_cursor_from_name ("default");
-        pin_location.sensitive = true;
+        pin_location.active = false;
 
         gesture_click.released.disconnect (on_click);
         key_controller.key_released.disconnect (on_keypress);
         map_widget.leaving_pin_mode.disconnect (on_exit_pin_mode);
     }
 
+    // If this handler fires, then the user did not click on the map
     private void on_click (int n_press, double x, double y) {
         debug ("%.2f, %.2f", x, y);
         map_widget.on_exit_pin_mode ();
@@ -412,13 +416,11 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
         return;
     }
 
+    // We only exit on Escape, as people may need to use other keys to navigate on the map from the keyboard
     private void on_keypress (uint keyval, uint keycode, Gdk.ModifierType state) {
-
-        // We only exit on Escape, as people may need to use other keys to navigate on the map from the keyboard
         if (keyval == Gdk.Key.Escape) {
             map_widget.on_exit_pin_mode ();
             on_exit_pin_mode ();
         }
-    
     }
 }
