@@ -6,11 +6,13 @@
  */
 
 public class Maps.MarkerManager : Object {
+    
+    private static bool popup_new_markers = false;
 
     private Storage storage;
     private unowned Shumate.MarkerLayer markerlayer;
 
-    private static bool popup_new_markers = false;
+    private static uint debounce_timer_id;
 
     public MarkerManager (Shumate.MarkerLayer markerlayer) {
         this.markerlayer = markerlayer;
@@ -29,7 +31,6 @@ public class Maps.MarkerManager : Object {
         }
 
         popup_new_markers = true;
-        save_all ();
     }
 
     public void add_marker (MarkerData markerdata) {
@@ -50,8 +51,21 @@ public class Maps.MarkerManager : Object {
     }
 
     public void save_all () {
-        debug ("\nSaving");
+        if (debounce_timer_id != 0) {
+            GLib.Source.remove (debounce_timer_id);
+        }
 
+        debounce_timer_id = Timeout.add (750, debounce_handler);
+    }
+
+    public bool debounce_handler () {
+        debounce_timer_id = 0;
+        immediately_save ();
+        return GLib.Source.REMOVE;
+    }
+
+    public void immediately_save () {
+        print ("\nSaving");
         var json_array = new Json.Array ();
 
         foreach (var marker in markerlayer.get_markers ()) {

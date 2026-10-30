@@ -47,7 +47,7 @@ public class Maps.Marker : Shumate.Marker {
 
         var scrolled = new Gtk.ScrolledWindow () {
             child = comment_textview,
-            height_request = 80,
+            height_request = 90,
             hexpand = true,
             vexpand = true,
             hscrollbar_policy = NEVER
@@ -99,10 +99,11 @@ public class Maps.Marker : Shumate.Marker {
             GLib.BindingFlags.DEFAULT);
 
         delete_button.clicked.connect (delete_marker);
-        popover.closed.connect (on_popover_closed);
+        name_entry.changed.connect (on_changed);
+        comment_textview.buffer.changed.connect (on_changed);
     }
 
-    public void on_popover_closed () {
+    public void on_changed () {
         changed ();
     }
 
