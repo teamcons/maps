@@ -33,7 +33,8 @@ public class Maps.Marker : Shumate.Marker {
             margin_top = 10,
             margin_bottom = 10,
             margin_start = 10,
-            margin_end = 10
+            margin_end = 10,
+            width_request = 210
         };
 
         var name_entry = new Gtk.Entry () {
@@ -49,19 +50,18 @@ public class Maps.Marker : Shumate.Marker {
             bottom_margin = 3,
             left_margin = 3,
         };
-
         comment_textview.buffer.text = markerdata.notes;
 
         var scrolled = new Gtk.ScrolledWindow () {
             child = comment_textview,
-            height_request = 90,
-            hexpand = true,
-            vexpand = true,
             hscrollbar_policy = NEVER
         };
 
         var frame = new Gtk.Frame (null) {
-            child = scrolled
+            child = scrolled,
+            height_request = 110,
+            hexpand = true,
+            vexpand = true
         };
 
         var delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic") {

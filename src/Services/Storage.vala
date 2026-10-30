@@ -47,7 +47,7 @@ public class Maps.Storage : Object {
      */
     public void save (Json.Array json_data) {
         ensure_datadir ();
-        debug ("Writing %u elements (Should be same number as points of interest)", json_data.get_length ());
+        debug ("Writing %u elements (Should be same number as locations)", json_data.get_length ());
 
         try {
             var generator = new Json.Generator ();
