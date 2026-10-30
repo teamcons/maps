@@ -5,6 +5,13 @@
  *                         2014-2015 Atlas Developers
  */
 
+/**
+ * Marker is a subclass of {@link Shumate.Marker} built from a {@link Maps.MarkerData}
+ *
+ * It uses as child a MenuButton, whose popover displays the MarkerData informations.
+ *
+ * The pointer is an image set as child of the MenuButton
+ */
 public class Maps.Marker : Shumate.Marker {
 
     public MarkerData markerdata {get; construct;}

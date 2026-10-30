@@ -5,6 +5,12 @@
  *                         2014-2015 Atlas Developers
  */
 
+/**
+ * MarkerManager manages locations on a {@link Shumate.MarkerLayer}
+ *  
+ * It loads {@link Maps.MarkerData} from {@link Maps.Storage}, from which it creates {@link Maps.Marker} widgets and adds them to the layer
+ *
+ */
 public class Maps.MarkerManager : Object {
     
     private static bool popup_new_markers = false;
@@ -41,16 +47,16 @@ public class Maps.MarkerManager : Object {
             marker.popup ();
         }
 
-        marker.changed.connect (save_all);
+        marker.changed.connect (save_debounce);
         marker.deletion_requested.connect (remove_marker);
     }
 
     public void remove_marker (Shumate.Marker marker) {
         markerlayer.remove_marker (marker);
-        save_all ();
+        save_debounce ();
     }
 
-    public void save_all () {
+    public void save_debounce () {
         if (debounce_timer_id != 0) {
             GLib.Source.remove (debounce_timer_id);
         }
@@ -65,7 +71,7 @@ public class Maps.MarkerManager : Object {
     }
 
     public void immediately_save () {
-        print ("\nSaving");
+        debug ("Saving");
         var json_array = new Json.Array ();
 
         foreach (var marker in markerlayer.get_markers ()) {

@@ -5,6 +5,13 @@
  *                         2014-2015 Atlas Developers
  */
 
+/**
+ * MarkerData represents the informations for a specific location
+ *
+ * It is used by {@link Maps.MarkerManager} to save, load, and represent locations on a map.
+ * 
+ * It can be converted from or into a {@link Json.Object} for convenience
+ */
 public class Maps.MarkerData : Object {
 
     public double latitude {get; set;}
@@ -12,9 +19,6 @@ public class Maps.MarkerData : Object {
     public string name {get; set; default = _("New location");}
     public string notes {get; set; default = "";}
 
-    /**
-    * Used to recreate individual points of interest from storage data
-    */
     public MarkerData.from_json (Json.Object node) {
         latitude = node.get_double_member ("lat");
         longitude = node.get_double_member ("long");
@@ -22,10 +26,6 @@ public class Maps.MarkerData : Object {
         notes = node.get_string_member ("notes");
     }
 
-    /*************************************************/
-    /**
-    * Used to convert points of interest into objects we can store
-    */
     public Json.Object to_json () {
         var builder = new Json.Builder ();
 

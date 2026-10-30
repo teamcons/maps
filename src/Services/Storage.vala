@@ -5,6 +5,9 @@
  *                         2014-2015 Atlas Developers
  */
 
+/**
+ * A wrapper for disk operations for the custom locations from {@link Maps.MarkerManager}
+ */
 public class Maps.Storage : Object {
 
     private const string STORAGE_FILENAME = "locations.json";
@@ -40,8 +43,8 @@ public class Maps.Storage : Object {
     }
 
     /**
-    * Converts a Json.Node into a string and take care of saving it
-    */
+     * Converts a Json.Node into a string and take care of saving it
+     */
     public void save (Json.Array json_data) {
         ensure_datadir ();
         debug ("Writing %u elements (Should be same number as points of interest)", json_data.get_length ());
@@ -59,8 +62,8 @@ public class Maps.Storage : Object {
     }
 
     /**
-    * Grab from storage, into a Json.Node we can parse. Insist if necessary
-    */
+     * Grab from storage, into a Json.Node we can parse. Insist if necessary
+     */
     public Json.Array load () {
 
         var parser = new Json.Parser ();
