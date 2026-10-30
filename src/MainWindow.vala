@@ -20,6 +20,7 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
 
     private const ActionEntry[] ACTION_ENTRIES = {
         { "search", on_search_activate },
+        { "pin", on_pin_activate },
     };
     private int current_busy_reason = 0;
     private ListStore location_store;
@@ -32,9 +33,17 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
     private Gtk.Popover search_res_popover;
     private MapWidget map_widget;
 
+    private Gtk.GestureClick gesture_click;
+    private Gtk.EventControllerKey key_controller;
+
     construct {
         title = _("Maps");
         add_action_entries (ACTION_ENTRIES, this);
+
+        gesture_click = new Gtk.GestureClick ();
+        key_controller = new Gtk.EventControllerKey ();
+        ((Gtk.Widget)this).add_controller (gesture_click);
+        ((Gtk.Widget)this).add_controller (key_controller);
 
         location_store = new ListStore (typeof (Geocode.Place));
 
@@ -45,6 +54,7 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
 
         pin_location = new Gtk.Button.from_icon_name ("view-pin-symbolic") {
             tooltip_text = _("Pin a location"),
+            action_name = "win.pin",
             valign = CENTER
         };
 
@@ -371,5 +381,44 @@ public class Maps.MainWindow : Adw.ApplicationWindow {
 
         var search_result_item = (SearchResultItem) list_item.child;
         search_result_item.place = (Geocode.Place) list_item.item;
+    }
+
+    private void on_pin_activate () {
+        pin_location.sensitive = false;
+
+        set_cursor_from_name ("crosshair");
+        map_widget.set_cursor_from_name ("crosshair");
+
+        gesture_click.released.connect (on_click);
+        key_controller.key_released.connect (on_keypress);
+        map_widget.leaving_pin_mode.connect (on_exit_pin_mode);
+
+        map_widget.enter_pin_mode ();
+    }
+
+    private void on_exit_pin_mode () {
+        set_cursor_from_name ("default");
+        pin_location.sensitive = true;
+
+        gesture_click.released.disconnect (on_click);
+        key_controller.key_released.disconnect (on_keypress);
+        map_widget.leaving_pin_mode.disconnect (on_exit_pin_mode);
+    }
+
+    private void on_click (int n_press, double x, double y) {
+        debug ("%.2f, %.2f", x, y);
+        map_widget.on_exit_pin_mode ();
+        on_exit_pin_mode ();
+        return;
+    }
+
+    private void on_keypress (uint keyval, uint keycode, Gdk.ModifierType state) {
+
+        // We only exit on Escape, as people may need to use other keys to navigate on the map from the keyboard
+        if (keyval == Gdk.Key.Escape) {
+            map_widget.on_exit_pin_mode ();
+            on_exit_pin_mode ();
+        }
+    
     }
 }

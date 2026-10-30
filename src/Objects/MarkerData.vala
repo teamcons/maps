@@ -7,18 +7,10 @@
 
 public class Maps.MarkerData : Object {
 
-    private static int last_id = 0;
-
     public double latitude {get; set;}
     public double longitude {get; set;}
-    public string name {get; set;}
-    public string notes {get; set;}
-    public int id {get; private set;}
-
-    public MarkerData () {
-        id = last_id;
-        last_id++;
-    }
+    public string name {get; set; default = _("New location");}
+    public string notes {get; set; default = "";}
 
     /**
     * Used to recreate individual points of interest from storage data

@@ -11,7 +11,7 @@ public class Maps.Marker : Shumate.Marker {
 
     private Gtk.Popover popover;
     public signal void changed ();
-    public signal void deletion_requested (int markerdata_id);
+    public signal void deletion_requested (Shumate.Marker marker);
 
     public Marker (MarkerData markerdata) {
         Object (
@@ -30,7 +30,8 @@ public class Maps.Marker : Shumate.Marker {
         };
 
         var name_entry = new Gtk.Entry () {
-            text = markerdata.name
+            text = markerdata.name,
+            placeholder_text = _("Name of the location")
         };
 
         var comment_textview = new Granite.HyperTextView () {
@@ -70,9 +71,15 @@ public class Maps.Marker : Shumate.Marker {
             child = box
         };
 
+        var image = new Gtk.Image.from_icon_name ("pointer") {
+            icon_size = Gtk.IconSize.LARGE
+        };
+
         var menubutton = new Gtk.MenuButton () {
             popover = popover,
-            icon_name = "mail-unread",
+            icon_name = "pointer",
+            child = image,
+            has_frame = false,
             tooltip_text = markerdata.name
         };
 
@@ -101,6 +108,10 @@ public class Maps.Marker : Shumate.Marker {
 
     public void delete_marker () {
         popover.popdown ();
-        deletion_requested (markerdata.id);
+        deletion_requested (this);
+    }
+
+    public void popup () {
+        popover.popup ();
     }
 }

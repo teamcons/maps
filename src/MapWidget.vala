@@ -22,10 +22,14 @@ public class Maps.MapWidget : Gtk.Box {
     private Shumate.MarkerLayer pin_layer;
     // Displays the position of current location
     private Shumate.MarkerLayer location_layer;
-
     private GClue.Location? location = null;
+    private Gtk.GestureClick gesture_click;
+
+    private MarkerManager marker_manager;
 
     private bool is_watching_location = false;
+
+    public signal void leaving_pin_mode ();
 
     // The Royal Observatory
     private const double DEFAULT_LATITUDE = 51.2840;
@@ -40,6 +44,9 @@ public class Maps.MapWidget : Gtk.Box {
             hexpand = true
         };
 
+        gesture_click = new Gtk.GestureClick ();
+        map_widget.add_controller (gesture_click);
+
         append (map_widget);
         base_map = map_widget.map;
     }
@@ -51,19 +58,8 @@ public class Maps.MapWidget : Gtk.Box {
         location_layer = new Shumate.MarkerLayer (map_widget.viewport);
         map_widget.add_overlay_layer (location_layer);
 
-
-        var markermanager = new MarkerManager (pin_layer);
-
-        var markerdata = new MarkerData () {
-            latitude = 48.858400,
-            longitude = 2.294500,
-            name = "Eiffel Tower!",
-            notes = "Elly was here! The place was very crowded!"
-        };
-
-        //  markermanager.add_marker (markerdata);
-        //  markermanager.save_all ();
-        markermanager.populate_layer.begin ();
+        marker_manager = new MarkerManager (pin_layer);
+        marker_manager.populate_layer.begin ();
     }
 
     // Set the initial location of the map widget.
@@ -204,5 +200,32 @@ public class Maps.MapWidget : Gtk.Box {
         };
 
         pin_layer.add_marker (marker);
+    }
+
+    public void enter_pin_mode () {
+        map_widget.map.set_cursor_from_name ("crosshair");
+        gesture_click.released.connect (on_click);
+    }
+
+    public void on_exit_pin_mode () {
+        map_widget.map.set_cursor_from_name ("default");
+        gesture_click.released.disconnect (on_click);
+        leaving_pin_mode ();
+    }
+
+    private void on_click (int n_press, double x, double y) {
+        double latitude, longitude;
+        map_widget.viewport.widget_coords_to_location (map_widget, x, y, out latitude, out longitude);
+
+        var markerdata = new MarkerData () {
+            latitude = latitude,
+            longitude = longitude
+        };
+
+        // We exit BEFORE adding, else new marker popups grabs focus and we can get into a weird limbo
+        marker_manager.add_marker (markerdata);
+        on_exit_pin_mode ();
+
+        return;
     }
 }

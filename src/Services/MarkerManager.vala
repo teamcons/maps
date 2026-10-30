@@ -6,10 +6,11 @@
  */
 
 public class Maps.MarkerManager : Object {
+
     private Storage storage;
-    private Gee.ArrayList<Maps.Marker?> marker_list;
     private unowned Shumate.MarkerLayer markerlayer;
 
+    private static bool popup_new_markers = false;
 
     public MarkerManager (Shumate.MarkerLayer markerlayer) {
         this.markerlayer = markerlayer;
@@ -17,7 +18,6 @@ public class Maps.MarkerManager : Object {
 
     construct {
         storage = new Storage ();
-        marker_list = new Gee.ArrayList<Maps.Marker?> ();
     }
 
     public async void populate_layer () {
@@ -25,50 +25,38 @@ public class Maps.MarkerManager : Object {
 
         foreach (var markerdata_note in markerdata_array.get_elements ()) {
             var markerdata = new MarkerData.from_json (markerdata_note.get_object ());
-
             add_marker (markerdata);
         }
 
+        popup_new_markers = true;
         save_all ();
     }
 
     public void add_marker (MarkerData markerdata) {
         var marker = new Marker (markerdata);
-        marker_list.add (marker);
         markerlayer.add_marker (marker);
+
+        if (popup_new_markers) {
+            marker.popup ();
+        }
 
         marker.changed.connect (save_all);
         marker.deletion_requested.connect (remove_marker);
     }
 
-    public void remove_marker (int marker_id) {
-        print ("Deletion requested!");
-
-        // Each MarkerData has an unique ID that mirrors their position in the list
-        var marker = marker_list[marker_id];
-
-        marker.changed.disconnect (save_all);
-
-        marker.deletion_requested.disconnect (remove_marker);
-        marker.destroy ();
-        marker_list[marker_id] = null;
-
+    public void remove_marker (Shumate.Marker marker) {
+        markerlayer.remove_marker (marker);
         save_all ();
     }
 
     public void save_all () {
-        print ("Saving!");
+        debug ("\nSaving");
 
         var json_array = new Json.Array ();
 
-        foreach (var marker in marker_list) {
-
-            // Deleted markers are set to null
-            if (marker == null) {
-                continue;
-            }
-
-            json_array.add_object_element (marker.markerdata.to_json ());
+        foreach (var marker in markerlayer.get_markers ()) {
+            var markerdata = ((Maps.Marker)marker).markerdata;
+            json_array.add_object_element (markerdata.to_json ());
         }
 
         storage.save (json_array);
