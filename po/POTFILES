@@ -4,3 +4,4 @@ src/MapWidget.vala
 src/Objects/MarkerData.vala
 src/SearchResultItem.vala
 src/Widgets/Marker.vala
+src/Widgets/SearchResultMarker.vala

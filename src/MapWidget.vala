@@ -19,7 +19,7 @@ public class Maps.MapWidget : Gtk.Box {
     private Shumate.SimpleMap map_widget;
     private Shumate.Map base_map;
     // Displays the "pin" icon at a specified place by search
-    private Shumate.MarkerLayer pin_layer;
+    private Shumate.MarkerLayer search_layer;
     // Displays the position of current location
     private Shumate.MarkerLayer location_layer;
     // Displays the position of user-pinned layers
@@ -54,8 +54,8 @@ public class Maps.MapWidget : Gtk.Box {
     }
 
     public void init_marker_layers () {
-        pin_layer = new Shumate.MarkerLayer (map_widget.viewport);
-        map_widget.add_overlay_layer (pin_layer);
+        search_layer = new Shumate.MarkerLayer (map_widget.viewport);
+        map_widget.add_overlay_layer (search_layer);
 
         location_layer = new Shumate.MarkerLayer (map_widget.viewport);
         map_widget.add_overlay_layer (location_layer);
@@ -165,8 +165,13 @@ public class Maps.MapWidget : Gtk.Box {
     }
 
     public void go_to_location (Geocode.Location location) {
-        pin_layer.remove_all ();
-        mark_pin_at (location.latitude, location.longitude);
+        search_layer.remove_all ();
+
+        var search_result_marker = new SearchResultMarker (location.latitude, location.longitude);
+        search_result_marker.create_pin.connect (marker_manager.add_marker);
+        search_result_marker.create_pin.connect_after (() => {search_layer.remove_all ();});
+        search_layer.add_marker (search_result_marker);
+
         base_map.go_to_full (location.latitude, location.longitude, DEFAULT_ZOOM_LEVEL);
     }
 
@@ -190,21 +195,6 @@ public class Maps.MapWidget : Gtk.Box {
         };
 
         location_layer.add_marker (marker);
-    }
-
-    private void mark_pin_at (double latitude, double longitude) {
-        var image = new Gtk.Image.from_icon_name ("pointer") {
-            icon_size = Gtk.IconSize.LARGE
-        };
-
-        var marker = new Shumate.Marker () {
-            latitude = latitude,
-            longitude = longitude,
-            child = image,
-            selectable = true
-        };
-
-        pin_layer.add_marker (marker);
     }
 
     public void enter_pin_mode () {

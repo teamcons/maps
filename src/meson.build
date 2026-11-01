@@ -34,7 +34,8 @@ sources = files(
     'Objects' / 'MarkerData.vala',
     'Services' / 'MarkerManager.vala',
     'Services' / 'Storage.vala',
-    'Widgets' / 'Marker.vala'
+    'Widgets' / 'Marker.vala',
+    'Widgets' / 'SearchResultMarker.vala',
 )
 
 executable(
