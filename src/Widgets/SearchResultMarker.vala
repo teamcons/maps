@@ -50,7 +50,7 @@ public class Maps.SearchResultMarker : Shumate.Marker {
         popover.position = Gtk.PositionType.TOP;
         child = menubutton;
 
-        button.activate.connect (on_button_click);
+        button.clicked.connect (on_button_click);
     }
 
     private void on_button_click () {
