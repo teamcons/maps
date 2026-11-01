@@ -22,6 +22,8 @@ public class Maps.MapWidget : Gtk.Box {
     private Shumate.MarkerLayer pin_layer;
     // Displays the position of current location
     private Shumate.MarkerLayer location_layer;
+    // Displays the position of user-pinned layers
+    private Shumate.MarkerLayer user_layer;
     private GClue.Location? location = null;
     private Gtk.GestureClick gesture_click;
 
@@ -58,7 +60,10 @@ public class Maps.MapWidget : Gtk.Box {
         location_layer = new Shumate.MarkerLayer (map_widget.viewport);
         map_widget.add_overlay_layer (location_layer);
 
-        marker_manager = new MarkerManager (pin_layer);
+        user_layer = new Shumate.MarkerLayer (map_widget.viewport);
+        map_widget.add_overlay_layer (user_layer);
+
+        marker_manager = new MarkerManager (user_layer);
         marker_manager.populate_layer.begin ();
     }
 
@@ -222,9 +227,8 @@ public class Maps.MapWidget : Gtk.Box {
             longitude = longitude
         };
 
-        // We exit BEFORE adding, else new marker popups grabs focus and we can get into a weird limbo
-        marker_manager.add_marker (markerdata);
         on_exit_pin_mode ();
+        marker_manager.add_marker (markerdata);
 
         return;
     }
