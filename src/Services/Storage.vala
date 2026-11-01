@@ -7,6 +7,8 @@
 
 /**
  * A wrapper for disk operations for the custom locations from {@link Maps.MarkerManager}
+ * 
+ * It can save () and load () a {@link Json.Array} object containing {@link Maps.MarkerData}
  */
 public class Maps.Storage : Object {
 

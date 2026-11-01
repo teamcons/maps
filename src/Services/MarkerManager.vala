@@ -13,12 +13,12 @@
  */
 public class Maps.MarkerManager : Object {
 
-    private static bool popup_new_markers = false;
+    private static uint debounce_timer_id;
+
+    public signal void pin_created (Marker marker);
 
     private Storage storage;
     private unowned Shumate.MarkerLayer markerlayer;
-
-    private static uint debounce_timer_id;
 
     public MarkerManager (Shumate.MarkerLayer markerlayer) {
         this.markerlayer = markerlayer;
@@ -36,19 +36,18 @@ public class Maps.MarkerManager : Object {
             add_marker (markerdata);
         }
 
-        popup_new_markers = true;
+        // Only care about new pins after loading everything
+        pin_created.connect (on_pin_created);
     }
 
     public void add_marker (MarkerData markerdata) {
         var marker = new Marker (markerdata);
         markerlayer.add_marker (marker);
 
-        if (popup_new_markers) {
-            marker.popup ();
-        }
-
         marker.changed.connect (save_debounce);
         marker.deletion_requested.connect (remove_marker);
+
+        pin_created (marker);
     }
 
     public void remove_marker (Shumate.Marker marker) {
@@ -75,10 +74,19 @@ public class Maps.MarkerManager : Object {
         var json_array = new Json.Array ();
 
         foreach (var marker in markerlayer.get_markers ()) {
-            var markerdata = ((Maps.Marker)marker).markerdata;
+            var markerdata = ((Maps.Marker)marker).to_markerdata ();
             json_array.add_object_element (markerdata.to_json ());
         }
 
         storage.save (json_array);
+    }
+
+    private void on_pin_created (Marker marker) {
+        marker.popup ();
+        save_debounce ();
+    }
+
+    ~MarkerManager () {
+        immediately_save ();
     }
 }

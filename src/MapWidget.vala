@@ -219,16 +219,11 @@ public class Maps.MapWidget : Gtk.Box {
     }
 
     private void on_click (int n_press, double x, double y) {
+        on_exit_pin_mode ();
+
         double latitude, longitude;
         map_widget.viewport.widget_coords_to_location (map_widget, x, y, out latitude, out longitude);
-
-        var markerdata = new MarkerData () {
-            latitude = latitude,
-            longitude = longitude
-        };
-
-        on_exit_pin_mode ();
-        marker_manager.add_marker (markerdata);
+        marker_manager.add_marker (new MarkerData (latitude, longitude));
 
         return;
     }

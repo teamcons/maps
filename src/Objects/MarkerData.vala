@@ -17,13 +17,20 @@ public class Maps.MarkerData : Object {
     public double latitude {get; set;}
     public double longitude {get; set;}
     public string name {get; set; default = _("New location");}
-    public string notes {get; set; default = "";}
+    public string comments {get; set; default = "";}
+
+    public MarkerData (double latitude, double longitude) {
+        Object (
+            latitude: latitude,
+            longitude: longitude
+        );
+    }
 
     public MarkerData.from_json (Json.Object node) {
         latitude = node.get_double_member ("lat");
         longitude = node.get_double_member ("long");
         name = node.get_string_member ("name");
-        notes = node.get_string_member ("notes");
+        comments = node.get_string_member ("comments");
     }
 
     public Json.Object to_json () {
@@ -36,8 +43,8 @@ public class Maps.MarkerData : Object {
         builder.add_double_value (longitude);
         builder.set_member_name ("name");
         builder.add_string_value (name);
-        builder.set_member_name ("notes");
-        builder.add_string_value (notes);
+        builder.set_member_name ("comments");
+        builder.add_string_value (comments);
         builder.end_object ();
 
         return builder.get_root ().get_object ();
