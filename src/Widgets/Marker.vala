@@ -18,25 +18,25 @@ public class Maps.Marker : Shumate.Marker {
     public signal void deletion_requested (Shumate.Marker marker);
 
     private Gtk.Popover popover;
-    private Gtk.Entry name_entry;
-    private Granite.HyperTextView comment_textview;
+    private Gtk.Entry entry_name;
+    private Granite.HyperTextView textview_comments;
 
     public string loc_name {
         owned get {
-            return name_entry.text.dup ();
+            return entry_name.text.dup ();
         }
         set {
-            name_entry.text = value;
+            entry_name.text = value;
             changed ();
         }
     }
 
     public string loc_comments {
         owned get {
-            return comment_textview.buffer.text.dup ();
+            return textview_comments.buffer.text.dup ();
         }
         set {
-            comment_textview.buffer.text = value;
+            textview_comments.buffer.text = value;
             changed ();
         }
     }
@@ -59,11 +59,15 @@ public class Maps.Marker : Shumate.Marker {
             width_request = 210
         };
 
-        name_entry = new Gtk.Entry () {
-            placeholder_text = _("Name of the location")
+        entry_name = new Gtk.Entry () {
+            show_emoji_icon = true
         };
 
-        comment_textview = new Granite.HyperTextView () {
+        var box_name = new Granite.Box (VERTICAL, NONE);
+        box_name.append (new Granite.HeaderLabel (_("Location name")));
+        box_name.append (entry_name);
+
+        textview_comments = new Granite.HyperTextView () {
             accepts_tab = false,
             wrap_mode = WORD_CHAR,
             top_margin = 3,
@@ -72,27 +76,35 @@ public class Maps.Marker : Shumate.Marker {
             left_margin = 3,
         };
 
-        var scrolled = new Gtk.ScrolledWindow () {
-            child = comment_textview,
+        var scrolled_comments = new Gtk.ScrolledWindow () {
+            child = textview_comments,
             hscrollbar_policy = NEVER
         };
 
-        var frame = new Gtk.Frame (null) {
-            child = scrolled,
+        var frame_comments = new Gtk.Frame (null) {
+            child = scrolled_comments,
             height_request = 110,
             hexpand = true,
             vexpand = true
         };
 
+        var box_comments = new Granite.Box (VERTICAL, NONE);
+        box_comments.append (new Granite.HeaderLabel (_("Comments")));
+        box_comments.append (frame_comments);
+
         var delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic") {
             tooltip_text = _("Delete this location"),
-            halign = Gtk.Align.START,
         };
         delete_button.add_css_class (Granite.CssClass.DESTRUCTIVE);
 
-        box.append (name_entry);
-        box.append (frame);
-        box.append (delete_button);
+        var box_toolbar = new Granite.Box (HORIZONTAL, HALF) {
+            halign = Gtk.Align.START,
+        };
+        box_toolbar.append (delete_button);
+
+        box.append (box_name);
+        box.append (box_comments);
+        box.append (box_toolbar);
 
         popover = new Gtk.Popover () {
             child = box
@@ -106,15 +118,21 @@ public class Maps.Marker : Shumate.Marker {
             popover = popover,
             child = image,
             has_frame = false,
-            tooltip_text = loc_name
         };
 
         popover.position = Gtk.PositionType.TOP;
         child = menubutton;
+        textview_comments.grab_focus ();
 
-        name_entry.changed.connect (on_changed);
-        comment_textview.buffer.changed.connect (on_changed);
+        bind_property ("loc-name",
+            menubutton, "tooltip-text",
+            GLib.BindingFlags.DEFAULT | GLib.BindingFlags.SYNC_CREATE
+        );
+
+        entry_name.changed.connect (on_changed);
+        textview_comments.buffer.changed.connect (on_changed);
         delete_button.clicked.connect (delete_marker);
+        popover.show.connect (on_show);
     }
 
     public void delete_marker () {
@@ -130,6 +148,16 @@ public class Maps.Marker : Shumate.Marker {
     // To avoid the infamous vala lambda leak bug
     public void on_changed () {
         changed ();
+    }
+
+    private void on_show () {
+        // Prevent entry_name from stealing the show by selecting its content
+        entry_name.select_region (-1, -1);
+        textview_comments.grab_focus ();
+    }
+
+    public void grab_entry () {
+        entry_name.grab_focus ();
     }
 
     public MarkerData to_markerdata () {

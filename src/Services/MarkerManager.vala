@@ -83,6 +83,7 @@ public class Maps.MarkerManager : Object {
 
     private void on_pin_created (Marker marker) {
         marker.popup ();
+        marker.grab_entry ();
         save_debounce ();
     }
 
