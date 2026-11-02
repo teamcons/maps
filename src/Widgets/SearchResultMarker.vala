@@ -15,6 +15,7 @@
 public class Maps.SearchResultMarker : Shumate.Marker {
 
     public signal void create_pin (MarkerData markerdata);
+    public signal void deletion_requested (Shumate.Marker marker);
 
     private Granite.HeaderLabel headerlabel;
     private Gtk.Popover popover;
@@ -54,10 +55,20 @@ public class Maps.SearchResultMarker : Shumate.Marker {
         };
 
         headerlabel = new Granite.HeaderLabel ("");
-        var button = new Gtk.Button.with_label (_("Create new pin"));
+
+        var delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic") {
+            tooltip_text = _("Delete this location"),
+        };
+        delete_button.add_css_class (Granite.CssClass.DESTRUCTIVE);
+        var button = new Gtk.Button.with_label (_("Create pin"));
+        button.add_css_class (Granite.CssClass.SUGGESTED);
+
+        var box_toolbar = new Gtk.CenterBox ();
+        box_toolbar.start_widget = delete_button;
+        box_toolbar.end_widget = button;
 
         box.append (headerlabel);
-        box.append (button);
+        box.append (box_toolbar);
 
         popover = new Gtk.Popover () {
             child = box
@@ -87,5 +98,10 @@ public class Maps.SearchResultMarker : Shumate.Marker {
             comments = loc_address
         };
         create_pin (new_marker_data);
+    }
+
+    public void delete_marker () {
+        popover.popdown ();
+        deletion_requested (this);
     }
 }
